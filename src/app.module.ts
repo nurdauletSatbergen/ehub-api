@@ -6,6 +6,7 @@ import process from 'node:process';
 import appConfig from './config/app.config';
 import dbConfig from './config/db.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         autoLoadEntities: configService.get<boolean>('database.autoLoadEntities'),
 
       })
-    })
+    }),
+    UsersModule
   ],
   controllers: [AppController],
   providers: [AppService],
