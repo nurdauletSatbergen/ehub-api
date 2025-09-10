@@ -41,7 +41,6 @@ export class UsersController {
 
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    console.log(id)
     return this.usersService.remove(id);
   }
 }
