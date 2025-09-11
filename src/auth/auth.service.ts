@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,7 +11,12 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async validateUser(email: string, password: string) {
+  async signUp(createUserDto: CreateUserDto) {
+    const user = await this.usersService.findOneByEmail(createUserDto.email);
+    if (user) throw new BadRequestException(`Email ${createUserDto.email} already in use!`);
+  }
+
+  async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findOneByEmail(email);
 
     if (user && user.password === password) {
