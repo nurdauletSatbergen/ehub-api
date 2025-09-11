@@ -7,24 +7,31 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import jwtConfig from './config/jwt.config';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   providers: [
     AuthService,
     LocalStrategy,
-    JwtStrategy
+    JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
   controllers: [AuthController],
   imports: [
+    ConfigModule.forFeature(jwtConfig),
     UsersModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      //TODO create a config file for auth and put secret
       useFactory: (configService: ConfigService) => ({
         global: true,
-        secret: 'secret',
+        secret: configService.get<string>('jwt.secret'),
         signOptions: {
           expiresIn: '3600s'
         }
