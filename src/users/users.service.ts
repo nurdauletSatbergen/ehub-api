@@ -4,19 +4,20 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { BcryptHashingService } from '../hashing/bcrypt-hashing.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly userRepo: Repository<User>
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    private readonly hashingService: BcryptHashingService
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = await this.findOneByEmail(createUserDto.email);
-    // TODO check if I use right exception type
-    if (user) throw new BadRequestException(`User with email ${createUserDto.email} already exists!`);
-
-    const newUser = this.userRepo.create(createUserDto);
+  async create({ password, ...props }: CreateUserDto): Promise<User> {
+    const user = await this.findOneByEmail(props.email);
+    if (user) throw new BadRequestException(`User with email ${props.email} already exists!`);
+    password =  await this.hashingService.hash(password);
+    const newUser = this.userRepo.create({ ...props, password });
     return this.userRepo.save(newUser);
   }
 

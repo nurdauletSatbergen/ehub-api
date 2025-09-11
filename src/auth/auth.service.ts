@@ -1,30 +1,29 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { BcryptHashingService } from '../hashing/bcrypt-hashing.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly hashingService: BcryptHashingService
   ) {}
 
-  async signUp(createUserDto: CreateUserDto) {
-    const user = await this.usersService.findOneByEmail(createUserDto.email);
-    if (user) throw new BadRequestException(`Email ${createUserDto.email} already in use!`);
+  signUp(createUserDto: CreateUserDto): Promise<User> {
+    return this.usersService.create(createUserDto);
   }
 
-  async validateUser(email: string, password: string): Promise<Omit<User, 'password'> | null> {
+  async validateUser(email: string, pass: string): Promise<Omit<User, 'password'> | null> {
     const user = await this.usersService.findOneByEmail(email);
-
-    if (user && user.password === password) {
-      const { password, ...props } = user;
-      return props;
-    }
-
-    return null;
+    if (!user) return null;
+    const isValid = await this.hashingService.compare(pass, user.password);
+    if (!isValid) return null;
+    const { password, ...props } = user;
+    return props;
   }
 
   login(user: Omit<User, "password">) {

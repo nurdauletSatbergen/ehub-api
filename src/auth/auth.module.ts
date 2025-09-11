@@ -10,6 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import jwtConfig from './config/jwt.config';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
+import { HashingModule } from '../hashing/hashing.module';
 
 @Module({
   providers: [
@@ -36,7 +37,8 @@ import { AuthGuard } from './guards/auth.guard';
           expiresIn: '3600s'
         }
       })
-    })
+    }),
+    HashingModule
   ],
   exports: [AuthService]
 })

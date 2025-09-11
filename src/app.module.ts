@@ -34,7 +34,7 @@ import { AuthModule } from './auth/auth.module';
       })
     }),
     UsersModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
