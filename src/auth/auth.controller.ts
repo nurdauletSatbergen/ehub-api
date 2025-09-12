@@ -12,6 +12,7 @@ import { GetUser } from './decorators/get-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { Public } from './decorators/public.decorator';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -37,5 +38,12 @@ export class AuthController {
   @Get('profile')
   getProfile(@GetUser() user: Omit<User, "password">) {
     return user;
+  }
+
+  @UseGuards(JwtRefreshAuthGuard)
+  @Public()
+  @Post('refresh')
+  refreshToken(@GetUser() user: Omit<User, "password">) {
+    return this.authService.login(user);
   }
 }

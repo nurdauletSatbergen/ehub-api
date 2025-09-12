@@ -11,12 +11,14 @@ import jwtConfig from './config/jwt.config';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { HashingModule } from '../hashing/hashing.module';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
   providers: [
     AuthService,
     LocalStrategy,
     JwtStrategy,
+    JwtRefreshStrategy,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
@@ -33,9 +35,6 @@ import { HashingModule } from '../hashing/hashing.module';
       useFactory: (configService: ConfigService) => ({
         global: true,
         secret: configService.get<string>('jwt.secret'),
-        signOptions: {
-          expiresIn: '3600s'
-        }
       })
     }),
     HashingModule
