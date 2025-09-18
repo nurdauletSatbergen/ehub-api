@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BcryptHashingService } from '../hashing/bcrypt-hashing.service';
+import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class UsersService {
@@ -21,8 +22,8 @@ export class UsersService {
     return this.userRepo.save(newUser);
   }
 
-  findAll(): Promise<User[]> {
-    return this.userRepo.find();
+  findAll() {
+    return paginate(this.userRepo, { page: 1, limit: 1 });
   }
 
   findOne(id: string) {
