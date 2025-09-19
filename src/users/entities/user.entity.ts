@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Course } from '../../courses/entities/course.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({
   name: 'users'
@@ -38,6 +39,7 @@ export class User {
   })
   email: string;
 
+  @Exclude()
   @Column({
     type: 'varchar',
     length: 96,
