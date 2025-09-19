@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { GetCoursesDto } from './dto/get-courses.dto';
+import { paginateRaw } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class CoursesService {
@@ -20,8 +21,25 @@ export class CoursesService {
     return this.courseRepo.save(course)
   }
 
-  findAll(getCoursesDto: GetCoursesDto) {
-    return `This action returns all courses`;
+  findAll({ search, from, to, page = 1, limit = 10 }: GetCoursesDto) {
+    const qb = this.courseRepo.createQueryBuilder('course');
+    if (search) {
+      qb.andWhere('course.title ILIKE :search OR course.description ILIKE :search', {
+        search: `%${search}%`,
+      });
+    }
+
+    if (from) {
+      qb.andWhere('course.createdAt >= :from', { from });
+    }
+
+    if (to) {
+      qb.andWhere('course.createdAt <= :to', { to });
+    }
+
+    qb.orderBy('course.createdAt', 'DESC');
+
+    return paginateRaw(qb, { page, limit });
   }
 
   async findOne(id: string) {

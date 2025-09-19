@@ -17,10 +17,10 @@ import { CoursesModule } from './courses/courses.module';
         : `.env.${process.env.NODE_ENV}`,
       load: [appConfig, dbConfig],
     }),
-    DatabaseModule,
     UsersModule,
     AuthModule,
     CoursesModule,
+    DatabaseModule,
   ],
 })
 export class AppModule {}
