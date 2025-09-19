@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Course } from '../../courses/entities/course.entity';
 
 @Entity({
   name: 'users'
@@ -42,6 +44,9 @@ export class User {
     nullable: false
   })
   password: string;
+
+  @OneToMany(() => Course, course => course.author)
+  courses: Course[];
 
   @CreateDateColumn()
   createdAt: Date;

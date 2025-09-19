@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Course } from './entities/course.entity';
+import { Repository } from 'typeorm';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { User } from '../users/entities/user.entity';
+import { GetCoursesDto } from './dto/get-courses.dto';
 
 @Injectable()
 export class CoursesService {
-  create(createCourseDto: CreateCourseDto) {
-    return 'This action adds a new course';
+  constructor(
+    @InjectRepository(Course) private courseRepo: Repository<Course>
+  ) {}
+
+  create(createCourseDto: CreateCourseDto, user: User) {
+    const course = this.courseRepo.create(createCourseDto);
+    course.author = user;
+    return this.courseRepo.save(course)
   }
 
-  findAll() {
+  findAll(getCoursesDto: GetCoursesDto) {
     return `This action returns all courses`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findOne(id: string) {
+    const course = await this.courseRepo.findOneBy({ id });
+    if (!course) throw new NotFoundException(`Course with ID ${id} not found!`);
+    return course;
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async update(id: string, updateCourseDto: UpdateCourseDto) {
+    const course = await this.courseRepo.findOneBy({ id });
+    if (!course) throw new NotFoundException(`Course with ID ${id} not found!`);
+    Object.assign(course, updateCourseDto);
+    return this.courseRepo.save(course);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async remove(id: string) {
+    const course = await this.courseRepo.findOneBy({ id });
+    if (!course) throw new NotFoundException(`Course with ID ${id} not found!`);
+    return this.courseRepo.remove(course);
   }
 }

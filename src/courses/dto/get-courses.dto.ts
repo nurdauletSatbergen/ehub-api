@@ -1,11 +1,11 @@
+import { IsOptional, IsString } from 'class-validator';
 import { IntersectionType } from '@nestjs/mapped-types';
 import { PaginationDto } from '../../common/dto/pagination.dto';
-import { IsOptional, IsString } from 'class-validator';
 
-class GetUsersDtoBase {
+class GetCoursesDtoBase {
   @IsString()
   @IsOptional()
   search?: string;
 }
 
-export class GetUsersDto extends IntersectionType(GetUsersDtoBase, PaginationDto) {}
+export class GetCoursesDto extends IntersectionType(GetCoursesDtoBase, PaginationDto) {}
