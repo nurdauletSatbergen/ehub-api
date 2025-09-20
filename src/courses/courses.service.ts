@@ -4,10 +4,9 @@ import { UpdateCourseDto } from './dto/update-course.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from './entities/course.entity';
 import { Repository } from 'typeorm';
-import { GetUser } from '../auth/decorators/get-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { GetCoursesDto } from './dto/get-courses.dto';
-import { paginateRaw } from 'nestjs-typeorm-paginate';
+import { paginate, paginateRaw } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class CoursesService {
@@ -39,7 +38,7 @@ export class CoursesService {
 
     qb.orderBy('course.createdAt', 'DESC');
 
-    return paginateRaw(qb, { page, limit });
+    return paginate(qb, { page, limit });
   }
 
   async findOne(id: string) {

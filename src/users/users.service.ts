@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BcryptHashingService } from '../hashing/bcrypt-hashing.service';
 import { paginate } from 'nestjs-typeorm-paginate';
+import { GetUsersDto } from './dto/get-users.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,8 +23,8 @@ export class UsersService {
     return this.userRepo.save(newUser);
   }
 
-  findAll() {
-    return paginate(this.userRepo, { page: 1, limit: 1 });
+  findAll({ page = 1, limit = 10 }: GetUsersDto) {
+    return paginate(this.userRepo, { page, limit });
   }
 
   findOne(id: string) {
